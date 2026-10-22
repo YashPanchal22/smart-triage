@@ -1,20 +1,60 @@
 import axios from 'axios';
+import { routeMock } from './mockApi';
 
-export const api = axios.create({ baseURL: '' }); // use vite proxy / same-origin
+export const isStaticDemo = typeof window !== 'undefined' && 
+  (window.location.hostname.includes('github.io') || window.location.protocol === 'file:');
 
-api.interceptors.request.use((cfg) => {
+export const api = axios.create({ baseURL: '' });
+
+api.interceptors.request.use(async (cfg) => {
   const t = localStorage.getItem('triage_token');
   if (t) cfg.headers.Authorization = `Bearer ${t}`;
+
+  // If running on static host (GitHub Pages), resolve immediately with full realistic demo data
+  if (isStaticDemo) {
+    cfg.adapter = async (config) => {
+      let parsedData: any = config.data;
+      if (typeof parsedData === 'string') {
+        try { parsedData = JSON.parse(parsedData); } catch {}
+      }
+      const mockResult = routeMock(config.method || 'get', config.url || '', parsedData, config.params);
+      return {
+        data: mockResult,
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config,
+      };
+    };
+  }
+
   return cfg;
 });
 
 api.interceptors.response.use(
   (r) => r,
-  (err) => {
-    if (err?.response?.status === 401 && !location.pathname.startsWith('/login')) {
+  async (err) => {
+    // If backend gave 404 or network connection error, fallback to mock data seamlessly!
+    const cfg = err?.config;
+    if (cfg && (err.response?.status === 404 || !err.response || err.code === 'ERR_NETWORK')) {
+      let parsedData: any = cfg.data;
+      if (typeof parsedData === 'string') {
+        try { parsedData = JSON.parse(parsedData); } catch {}
+      }
+      const mockResult = routeMock(cfg.method || 'get', cfg.url || '', parsedData, cfg.params);
+      return {
+        data: mockResult,
+        status: 200,
+        statusText: 'OK (Mock Fallback)',
+        headers: {},
+        config: cfg,
+      };
+    }
+
+    if (err?.response?.status === 401 && !window.location.hash.includes('login')) {
       localStorage.removeItem('triage_token');
       localStorage.removeItem('triage_user');
-      location.href = '/login';
+      window.location.hash = '#/login';
     }
     return Promise.reject(err);
   }

@@ -18,7 +18,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
   const logout = () => {
     localStorage.removeItem('triage_token'); localStorage.removeItem('triage_user');
-    setUser(null); location.href = '/login';
+    setUser(null); window.location.hash = '#/login';
   };
   const refresh = async () => {
     try { const { data } = await api.get('/api/auth/me'); setUser(data); localStorage.setItem('triage_user', JSON.stringify(data)); }

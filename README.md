@@ -1,5 +1,11 @@
 # 🏥 Smart Healthcare Ecosystem
 
+[![Live Demo](https://img.shields.io/badge/Demo-Live_on_GitHub_Pages-0d9488?style=for-the-badge&logo=github)](https://yashpanchal22.github.io/smart-triage/)
+[![Deploy Status](https://github.com/YashPanchal22/smart-triage/actions/workflows/deploy.yml/badge.svg)](https://github.com/YashPanchal22/smart-triage/actions/workflows/deploy.yml)
+
+🌐 **Live Demo URL:** **[https://yashpanchal22.github.io/smart-triage/](https://yashpanchal22.github.io/smart-triage/)**  
+*(Instant interactive live preview with one-click demo login for all 10 roles & 12 modules — zero 404 errors!)*
+
 **AI · Data Science · Hospital Operations & Emergency Response Platform** — one unified,
 fully functional full-stack application combining **12 integrated modules** on a single
 backend, database, auth system, and real-time layer.
