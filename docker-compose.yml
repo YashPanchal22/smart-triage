@@ -1,0 +1,38 @@
+# Smart Healthcare Ecosystem — demo deployment
+# Usage: docker compose up --build
+# Frontend: http://localhost:5173 · Backend docs: http://localhost:8000/api/docs
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: smartcare
+      POSTGRES_PASSWORD: smartcare
+      POSTGRES_DB: smart_healthcare
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgresql://smartcare:smartcare@db:5432/smart_healthcare
+      SECRET_KEY: change-me-in-production
+      ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: 480
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    command: sh -c "python -c \"from app.database import Base,engine,SessionLocal; from app.seed_eco import seed_eco; Base.metadata.create_all(bind=engine); db=SessionLocal(); print(seed_eco(db))\" && python -m uvicorn app.main:app --host 0.0.0.0 --port 8000"
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:

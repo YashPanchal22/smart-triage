@@ -1,0 +1,65 @@
+# Environment files & Secrets
+.env
+*.env
+backend/.env
+frontend/.env
+*.local
+
+# Node.js / Frontend
+node_modules/
+frontend/node_modules/
+dist/
+frontend/dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python / Backend
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Databases & SQLite
+*.db
+*.sqlite
+*.sqlite3
+backend/*.db
+backend/smart_triage.db
+
+# User Uploads
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+Thumbs.db
+Desktop.ini
+.DS_Store

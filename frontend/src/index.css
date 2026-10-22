@@ -1,0 +1,96 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------- Smart Healthcare Ecosystem — clinical design system ---------- */
+body {
+  @apply text-slate-800 dark:text-slate-100 antialiased;
+  background:
+    radial-gradient(1200px 400px at 85% -80px, rgba(13,148,136,.10), transparent 60%),
+    radial-gradient(900px 380px at -10% 0%, rgba(56,189,248,.10), transparent 55%),
+    linear-gradient(180deg, #f2fbf8 0%, #eef4fb 100%);
+  background-attachment: fixed;
+}
+.dark body, body.dark {
+  background:
+    radial-gradient(1200px 400px at 85% -80px, rgba(13,148,136,.16), transparent 60%),
+    radial-gradient(900px 380px at -10% 0%, rgba(56,189,248,.10), transparent 55%),
+    linear-gradient(180deg, #071823 0%, #050f18 100%);
+  background-attachment: fixed;
+}
+.dark { color-scheme: dark; }
+
+/* Cards */
+.card {
+  @apply bg-white/95 dark:bg-[#0b2233]/95 rounded-2xl border border-teal-900/10 dark:border-teal-100/10 p-5 backdrop-blur;
+  box-shadow: 0 1px 3px rgba(13,148,136,.08), 0 8px 24px -12px rgba(13,148,136,.18);
+}
+.card-hover { @apply transition hover:-translate-y-0.5; }
+.card-hover:hover { box-shadow: 0 0 0 3px rgba(13,148,136,.18), 0 12px 32px -12px rgba(13,148,136,.35); }
+
+/* Inputs & buttons */
+.input { @apply w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#0e2a3f] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition; }
+.btn { @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition active:scale-[.98]; }
+.btn-primary { @apply btn text-white;
+  background: linear-gradient(135deg, #0d9488 0%, #0e7490 60%, #0369a1 100%);
+  box-shadow: 0 6px 16px -6px rgba(13,148,136,.5); }
+.btn-primary:hover { filter: brightness(1.08); }
+.btn-ghost { @apply btn border border-slate-300 dark:border-slate-600 bg-white/60 dark:bg-white/5 hover:bg-teal-50 dark:hover:bg-teal-900/30 hover:border-brand-400; }
+.btn-danger { @apply btn text-white;
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  box-shadow: 0 6px 16px -6px rgba(220,38,38,.5); }
+.btn-danger:hover { filter: brightness(1.08); }
+.btn-ok { @apply btn bg-emerald-600 text-white hover:bg-emerald-700; }
+.label { @apply block text-xs font-semibold uppercase tracking-wide text-teal-800/70 dark:text-teal-100/60 mb-1; }
+
+/* Tables */
+table.grid-table { @apply w-full text-sm; }
+table.grid-table thead th { @apply sticky top-0 text-left px-3 py-2.5 text-[11px] uppercase tracking-wider text-teal-900/70 dark:text-teal-100/70 bg-teal-50/80 dark:bg-teal-950/40 border-b border-teal-900/10 dark:border-teal-100/10 backdrop-blur; }
+table.grid-table tbody td { @apply px-3 py-2.5 border-b border-slate-100 dark:border-white/5; }
+table.grid-table tbody tr { @apply transition hover:bg-teal-50/60 dark:hover:bg-teal-900/20; }
+
+/* Sidebar nav */
+.navlink { @apply relative flex items-center gap-2.5 rounded-xl px-3.5 py-2 text-[13px] font-medium text-slate-600 dark:text-slate-300 hover:bg-teal-50 dark:hover:bg-teal-900/30 hover:text-teal-800 dark:hover:text-teal-100 transition; }
+.navlink.active { @apply text-white;
+  background: linear-gradient(135deg, #0d9488 0%, #0e7490 100%);
+  box-shadow: 0 4px 12px -4px rgba(13,148,136,.6); }
+
+/* Priority glow rows */
+.pri-emergency { box-shadow: inset 4px 0 0 #dc2626; }
+.pri-urgent { box-shadow: inset 4px 0 0 #f97316; }
+.pri-semi_urgent { box-shadow: inset 4px 0 0 #eab308; }
+.pri-routine { box-shadow: inset 4px 0 0 #10b981; }
+
+/* Hero gradient panel */
+.hero-panel {
+  background:
+    radial-gradient(600px 200px at 90% 10%, rgba(255,255,255,.18), transparent 60%),
+    radial-gradient(400px 300px at 10% 90%, rgba(45,212,191,.35), transparent 60%),
+    linear-gradient(120deg, #0f766e 0%, #0e7490 55%, #1e3a8a 100%);
+}
+.hero-grid {
+  background-image: linear-gradient(rgba(255,255,255,.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.07) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: radial-gradient(ellipse at 30% 20%, black 30%, transparent 75%);
+}
+
+/* ECG line */
+.ecg-path { stroke-dasharray: 320; stroke-dashoffset: 320; }
+
+/* Ticker */
+.ticker-mask { mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent); }
+
+/* Scrollbars */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { @apply rounded-full bg-teal-700/30 dark:bg-teal-100/20 border-2 border-transparent bg-clip-padding; }
+::-webkit-scrollbar-thumb:hover { @apply bg-teal-600/50; }
+
+/* Section titles */
+.h-section { @apply text-lg font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2; }
+.h-section::before { content: ''; @apply inline-block h-5 w-1.5 rounded-full;
+  background: linear-gradient(180deg, #14b8a6, #0369a1); }
+
+@keyframes pulse-red { 0%,100% { opacity: 1; } 50% { opacity: .45; } }
+.emergency-flash { animation: pulse-red 1.2s ease-in-out infinite; }
