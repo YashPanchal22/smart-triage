@@ -15,7 +15,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func
 
-from .database import Base, engine, get_db
+from .database import Base, engine, get_db, SessionLocal
 from .models import (
     User, Department, Doctor, Patient, Visit, TriageAssessment,
     TriageRule, HospitalResource, Notification, AuditLog,
@@ -38,6 +38,27 @@ app = FastAPI(
     docs_url="/api/docs",
     openapi_url="/api/openapi.json",
 )
+
+@app.on_event("startup")
+def startup_db_check():
+    Base.metadata.create_all(bind=engine)
+    db = SessionLocal()
+    try:
+        from .models import User
+        if db.query(User).count() == 0:
+            print("[INFO] New database detected with 0 users. Initializing demo seed data...")
+            from .seed import seed_all
+            from .seed_eco import seed_eco
+            from .seed_eco2 import seed_eco2
+            seed_all(db, patients_n=100, doctors_n=20, visits_n=200)
+            seed_eco(db)
+            seed_eco2(db)
+            db.commit()
+            print("[INFO] Database initialization completed successfully.")
+    except Exception as e:
+        print(f"[WARN] Database startup verification notice: {e}")
+    finally:
+        db.close()
 
 import os
 cors_origins_env = os.getenv("CORS_ORIGINS", "")

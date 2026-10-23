@@ -748,7 +748,24 @@ export function routeMock(method: string, url: string, data?: any, params?: any)
     return { hospital_name: 'Smart Healthcare Ecosystem', maintenance_mode: false, auto_triage_enabled: true };
   }
   if (norm === '/admin/db-stats') {
-    return { tables_count: 28, patients: 1042, appointments: 5000, visits: 5000, audit_events: 12450 };
+    return {
+      patients: 1001,
+      appointments: 5004,
+      visits: 5000,
+      triage_assessments: 5000,
+      doctors: 100,
+      nurses: 42,
+      departments: 15,
+      hospital_beds: 220,
+      blood_donors: 500,
+      blood_inventory: 8,
+      emergency_requests: 61,
+      pharmacy_inventory: 45,
+      lab_orders: 251,
+      lab_results: 119,
+      audit_logs: 80,
+      system_settings: 7
+    };
   }
   if (norm.startsWith('/admin/security')) {
     return [

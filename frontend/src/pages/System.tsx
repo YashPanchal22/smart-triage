@@ -42,9 +42,22 @@ export default function System() {
       {tab === 'db' && (
         <div className="card">
           <h3 className="h-section">Database monitoring (row counts)</h3>
-          <div className="mt-3 grid grid-cols-2 gap-2 md:grid-cols-4">{Object.entries(stats).sort((a: any, b: any) => b[1] - a[1]).map(([k, v]) => (
-            <div key={k} className="rounded-xl bg-slate-50 dark:bg-white/5 p-2.5"><p className="font-mono text-xs text-slate-500">{k}</p><p className="text-xl font-black">{String(v)}</p></div>))}</div>
-        </div>)}
+          {Object.keys(stats || {}).length === 0 ? (
+            <p className="mt-3 text-sm text-slate-500">Loading database table row counts...</p>
+          ) : (
+            <div className="mt-3 grid grid-cols-2 gap-2 md:grid-cols-4">
+              {Object.entries(stats || {})
+                .sort((a: any, b: any) => Number(b[1] || 0) - Number(a[1] || 0))
+                .map(([k, v]) => (
+                  <div key={k} className="rounded-xl bg-slate-50 dark:bg-white/5 p-2.5">
+                    <p className="font-mono text-xs text-slate-500">{k}</p>
+                    <p className="text-xl font-black">{String(v)}</p>
+                  </div>
+                ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {tab === 'sec' && (
         <div className="card !p-0 overflow-hidden">
