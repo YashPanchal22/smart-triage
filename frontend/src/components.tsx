@@ -44,7 +44,8 @@ export function StatusBadge({ value }: { value: string }) {
     registered: 'bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
     cancelled: 'bg-stone-200 text-stone-600',
   };
-  return <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-bold ${map[value] || map.registered}`}>{value.replace(/_/g, ' ')}</span>;
+  const val = String(value || 'registered');
+  return <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-bold ${map[val] || map.registered}`}>{val.replace(/_/g, ' ')}</span>;
 }
 
 const KPI_GRAD: Record<string, string> = {
@@ -92,65 +93,99 @@ type Link = [string, string, string];
 
 // Separate sidebar per role — each role gets its own workflow menu.
 const ROLE_MENUS: Record<string, [string, Link[]][]> = {
-  patient: [[ 'My Care', [
-    ['/', '🏠', 'Dashboard'], ['/profile', '👤', 'My Profile'], ['/appointments', '📅', 'Appointments'], ['/visits', '🏥', 'My Visits'], ['/billing', '🧾', 'My Bills'],
-  ]], ['Wellness', [
-    ['/medicines', '💊', 'Medicine Info'], ['/assistant', '🤖', 'Health Assistant'], ['/nutrition', '🥗', 'Nutrition'], ['/wellness', '💙', 'Wellness'], ['/rural', '🌾', 'Rural Health'],
-  ]], ['Account', [
-    ['/notifications', '🔔', 'Notifications'], ['/preferences', '⚙️', 'Settings'],
-  ]]],
-  doctor: [[ 'Clinical', [
-    ['/', '🏠', 'Dashboard'], ['/patients', '👥', 'My Patients'], ['/queue', '🚨', 'Priority Queue'], ['/appointments', '📅', 'Appointments'], ['/consultations', '🩺', 'Consultations'],
-  ]], ['Records', [
-    ['/lab', '🧪', 'Lab Reports'], ['/medicines', '💊', 'Medication Info'], ['/analytics', '📊', 'My Analytics'],
-  ]], ['Account', [
-    ['/notifications', '🔔', 'Notifications'], ['/preferences', '⚙️', 'Settings'],
-  ]]],
-  nurse: [[ 'Nurse Station', [
-    ['/', '🏠', 'Dashboard'], ['/patients', '👥', 'Patients'], ['/triage', '🚨', 'Triage'], ['/queue', '📋', 'Patient Queue'], ['/tasks', '💉', 'Nursing Tasks'],
-  ]], ['Care', [
-    ['/consultations', '📝', 'Care Notes'], ['/resources', '🛏️', 'Bed Management'], ['/appointments', '📅', 'Appointments'], ['/lab', '🧪', 'Lab Status'], ['/reports', '📊', 'Nursing Reports'],
-  ]], ['Account', [
-    ['/notifications', '🔔', 'Alerts'], ['/preferences', '⚙️', 'Settings'],
-  ]]],
-  emergency: [[ 'Response', [
-    ['/', '🏠', 'Dashboard'], ['/emergency', '🚨', 'Active Emergencies'], ['/emergency', '🚑', 'Ambulances'], ['/queue', '👥', 'Emergency Patients'],
-  ]], ['Resources', [
-    ['/resources', '🏥', 'Hospital Capacity'], ['/notifications', '🔔', 'Alerts'],
-  ]], ['Account', [
-    ['/preferences', '⚙️', 'Settings'],
-  ]]],
-  blood: [[ 'Blood Bank', [
-    ['/', '🏠', 'Dashboard'], ['/blood', '🩸', 'Blood Inventory'], ['/blood', '👥', 'Donors'], ['/blood', '📋', 'Blood Requests'],
-  ]], ['Account', [
-    ['/notifications', '🔔', 'Alerts'], ['/preferences', '⚙️', 'Settings'],
-  ]]],
-  pharmacy: [[ 'Dispensary', [
-    ['/', '🏠', 'Dashboard'], ['/pharmacy', '💊', 'Inventory'], ['/pharmacy', '📋', 'Order Queue'], ['/medicines', '📖', 'Medicine Info'],
-  ]], ['Account', [
-    ['/notifications', '🔔', 'Notifications'], ['/preferences', '⚙️', 'Settings'],
-  ]]],
-  lab: [[ 'Laboratory', [
-    ['/', '🏠', 'Dashboard'], ['/lab', '🧪', 'Test Requests'], ['/lab', '🔬', 'Samples & Results'],
-  ]], ['Account', [
-    ['/notifications', '🔔', 'Notifications'], ['/preferences', '⚙️', 'Settings'],
-  ]]],
-  admin: [[ 'Hospital', [
-    ['/', '🏠', 'Dashboard'], ['/patients', '👥', 'Patients'], ['/doctors', '👨‍⚕️', 'Doctors'], ['/users', '👩‍⚕️', 'Staff & Nurses'], ['/departments', '🏢', 'Departments'], ['/appointments', '📅', 'Appointments'],
-  ]], ['Operations', [
-    ['/queue', '🚨', 'Triage & Queue'], ['/consultations', '🩺', 'Consultations'], ['/tasks', '💉', 'Nursing Tasks'], ['/emergency', '🚑', 'Emergency'], ['/blood', '🩸', 'Blood Bank'], ['/pharmacy', '💊', 'Pharmacy'], ['/lab', '🧪', 'Laboratory'], ['/resources', '🛏️', 'Resources'],
-  ]], ['Insight', [
-    ['/analytics', '📊', 'Analytics'], ['/risk', '🧬', 'Risk Lab'], ['/billing', '💰', 'Billing'], ['/reports', '📄', 'Reports & Audit'], ['/settings', '⚙️', 'Triage Rules'], ['/assistant', '🤖', 'AI Assistant'], ['/rural', '🌾', 'Rural'], ['/nutrition', '🥗', 'Nutrition'], ['/wellness', '💙', 'Wellness'],
-  ]], ['Account', [
-    ['/users', '🔐', 'Users (view)'], ['/system', '🖥️', 'System (view)'], ['/notifications', '🔔', 'Alerts'], ['/preferences', '⚙️', 'Settings'],
-  ]]],
-  superadmin: [[ 'System', [
-    ['/', '🏠', 'Dashboard'], ['/users', '👥', 'User Management'], ['/users', '🔐', 'Roles & Permissions'], ['/departments', '🏢', 'Departments'], ['/system', '⚙️', 'Configuration'], ['/system', '🗄️', 'Database'], ['/analytics', '📊', 'System Analytics'], ['/system', '🛡️', 'Security'], ['/reports', '📋', 'Audit Logs'],
-  ]], ['Oversight', [
-    ['/patients', '🧑‍⚕️', 'Patients'], ['/queue', '📋', 'Queues'], ['/emergency', '🚑', 'Emergency'], ['/blood', '🩸', 'Blood Bank'], ['/pharmacy', '💊', 'Pharmacy'], ['/lab', '🧪', 'Laboratory'],
-  ]], ['Account', [
-    ['/notifications', '🔔', 'System Alerts'], ['/preferences', '⚙️', 'Settings'],
-  ]]],
+  patient: [
+    ['My Care', [
+      ['/', '🏠', 'Dashboard'], ['/profile', '👤', 'My Profile'], ['/appointments', '📅', 'Appointments'], ['/visits', '🏥', 'My Visits'], ['/billing', '🧾', 'My Bills'],
+    ]],
+    ['Wellness', [
+      ['/medicines', '💊', 'Medicine Info'], ['/assistant', '🤖', 'Health Assistant'], ['/nutrition', '🥗', 'Nutrition'], ['/wellness', '💙', 'Wellness'], ['/rural', '🌾', 'Rural Health'],
+    ]],
+    ['Account', [
+      ['/notifications', '🔔', 'Notifications'], ['/preferences', '⚙️', 'Settings'],
+    ]],
+  ],
+  doctor: [
+    ['Clinical', [
+      ['/', '🏠', 'Dashboard'], ['/patients', '👥', 'My Patients'], ['/queue', '🚨', 'Priority Queue'], ['/appointments', '📅', 'Appointments'], ['/consultations', '🩺', 'Consultations'],
+    ]],
+    ['Records', [
+      ['/lab', '🧪', 'Lab Reports'], ['/medicines', '💊', 'Medication Info'], ['/analytics', '📊', 'My Analytics'],
+    ]],
+    ['Account', [
+      ['/notifications', '🔔', 'Notifications'], ['/preferences', '⚙️', 'Settings'],
+    ]],
+  ],
+  nurse: [
+    ['Nurse Station', [
+      ['/', '🏠', 'Dashboard'], ['/patients', '👥', 'Patients'], ['/triage', '🚨', 'Triage'], ['/queue', '📋', 'Patient Queue'], ['/tasks', '💉', 'Nursing Tasks'],
+    ]],
+    ['Care', [
+      ['/consultations', '📝', 'Care Notes'], ['/resources', '🛏️', 'Bed Management'], ['/appointments', '📅', 'Appointments'], ['/lab', '🧪', 'Lab Status'], ['/reports', '📊', 'Nursing Reports'],
+    ]],
+    ['Account', [
+      ['/notifications', '🔔', 'Alerts'], ['/preferences', '⚙️', 'Settings'],
+    ]],
+  ],
+  emergency: [
+    ['Response', [
+      ['/', '🏠', 'Dashboard'], ['/emergency', '🚨', 'Active Emergencies'], ['/emergency', '🚑', 'Ambulances'], ['/queue', '👥', 'Emergency Patients'],
+    ]],
+    ['Resources', [
+      ['/resources', '🏥', 'Hospital Capacity'], ['/notifications', '🔔', 'Alerts'],
+    ]],
+    ['Account', [
+      ['/preferences', '⚙️', 'Settings'],
+    ]],
+  ],
+  blood: [
+    ['Blood Bank', [
+      ['/', '🏠', 'Dashboard'], ['/blood', '🩸', 'Blood Inventory'], ['/blood', '👥', 'Donors'], ['/blood', '📋', 'Blood Requests'],
+    ]],
+    ['Account', [
+      ['/notifications', '🔔', 'Alerts'], ['/preferences', '⚙️', 'Settings'],
+    ]],
+  ],
+  pharmacy: [
+    ['Dispensary', [
+      ['/', '🏠', 'Dashboard'], ['/pharmacy', '💊', 'Inventory'], ['/pharmacy', '📋', 'Order Queue'], ['/medicines', '📖', 'Medicine Info'],
+    ]],
+    ['Account', [
+      ['/notifications', '🔔', 'Notifications'], ['/preferences', '⚙️', 'Settings'],
+    ]],
+  ],
+  lab: [
+    ['Laboratory', [
+      ['/', '🏠', 'Dashboard'], ['/lab', '🧪', 'Test Requests'], ['/lab', '🔬', 'Samples & Results'],
+    ]],
+    ['Account', [
+      ['/notifications', '🔔', 'Notifications'], ['/preferences', '⚙️', 'Settings'],
+    ]],
+  ],
+  admin: [
+    ['Hospital', [
+      ['/', '🏠', 'Dashboard'], ['/patients', '👥', 'Patients'], ['/doctors', '👨‍⚕️', 'Doctors'], ['/users', '👩‍⚕️', 'Staff & Nurses'], ['/departments', '🏢', 'Departments'], ['/appointments', '📅', 'Appointments'],
+    ]],
+    ['Operations', [
+      ['/queue', '🚨', 'Triage & Queue'], ['/consultations', '🩺', 'Consultations'], ['/tasks', '💉', 'Nursing Tasks'], ['/emergency', '🚑', 'Emergency'], ['/blood', '🩸', 'Blood Bank'], ['/pharmacy', '💊', 'Pharmacy'], ['/lab', '🧪', 'Laboratory'], ['/resources', '🛏️', 'Resources'],
+    ]],
+    ['Insight', [
+      ['/analytics', '📊', 'Analytics'], ['/risk', '🧬', 'Risk Lab'], ['/billing', '💰', 'Billing'], ['/reports', '📄', 'Reports & Audit'], ['/settings', '⚙️', 'Triage Rules'], ['/assistant', '🤖', 'AI Assistant'], ['/rural', '🌾', 'Rural'], ['/nutrition', '🥗', 'Nutrition'], ['/wellness', '💙', 'Wellness'],
+    ]],
+    ['Account', [
+      ['/users', '🔐', 'Users (view)'], ['/system', '🖥️', 'System (view)'], ['/notifications', '🔔', 'Alerts'], ['/preferences', '⚙️', 'Settings'],
+    ]],
+  ],
+  superadmin: [
+    ['System', [
+      ['/', '🏠', 'Dashboard'], ['/users', '👥', 'User Management'], ['/users', '🔐', 'Roles & Permissions'], ['/departments', '🏢', 'Departments'], ['/system', '⚙️', 'Configuration'], ['/system', '🗄️', 'Database'], ['/analytics', '📊', 'System Analytics'], ['/system', '🛡️', 'Security'], ['/reports', '📋', 'Audit Logs'],
+    ]],
+    ['Oversight', [
+      ['/patients', '🧑‍⚕️', 'Patients'], ['/queue', '📋', 'Queues'], ['/emergency', '🚑', 'Emergency'], ['/blood', '🩸', 'Blood Bank'], ['/pharmacy', '💊', 'Pharmacy'], ['/lab', '🧪', 'Laboratory'],
+    ]],
+    ['Account', [
+      ['/notifications', '🔔', 'System Alerts'], ['/preferences', '⚙️', 'Settings'],
+    ]],
+  ],
 };
 ROLE_MENUS.triage = ROLE_MENUS.nurse;
 
@@ -242,9 +277,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
   const role = user?.role || 'patient';
   const MENU = ROLE_MENUS[role] || ROLE_MENUS.patient;
-  const flatLinks = MENU.flatMap(([_, links]) => links);
+  const flatLinks = (MENU || []).flatMap(([_, links]) => (Array.isArray(links) ? links : []));
   const seen = new Set<string>();
-  const uniqFlat = flatLinks.filter(([to]) => (seen.has(to) ? false : (seen.add(to), true)));
+  const uniqFlat = flatLinks.filter((item) => {
+    if (!Array.isArray(item) || typeof item[0] !== 'string') return false;
+    const to = item[0];
+    return seen.has(to) ? false : (seen.add(to), true);
+  });
   const roleColor: Record<string, string> = { admin: 'bg-violet-600', superadmin: 'bg-indigo-900', doctor: 'bg-sky-600', nurse: 'bg-teal-600', triage: 'bg-teal-600', patient: 'bg-slate-500', blood: 'bg-rose-600', emergency: 'bg-red-600', pharmacy: 'bg-amber-600', lab: 'bg-purple-600' };
 
   return (
