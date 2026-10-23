@@ -4,24 +4,26 @@
     <meta charset="utf-8">
     <title>Smart Healthcare Ecosystem — Redirecting</title>
     <script type="text/javascript">
-      // Single Page Apps for GitHub Pages
-      // MIT License
-      // https://github.com/rafgraph/spa-github-pages
-      var pathSegmentsToKeep = 1;
+      // Single Page Apps for GitHub Pages & static hosting
+      // Detect whether deployed on GitHub Pages with subpath (e.g. /smart-triage/) or custom/root domain
+      var isGitHubPages = window.location.hostname.endsWith('github.io');
+      var pathSegmentsToKeep = (isGitHubPages && window.location.pathname.split('/')[1]) ? 1 : 0;
       var l = window.location;
+      var basePath = l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/');
+      var routePath = l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~');
       l.replace(
         l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
-        l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
-        l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
+        basePath + '/?/' +
+        routePath +
         (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
         l.hash
       );
     </script>
   </head>
   <body>
-    <div style="font-family: system-ui, sans-serif; text-align: center; padding: 50px;">
-      <h2>Loading Smart Healthcare Ecosystem...</h2>
-      <p>Redirecting to live application...</p>
+    <div style="font-family: system-ui, -apple-system, sans-serif; text-align: center; padding: 60px 20px; color: #334155;">
+      <h2 style="font-size: 24px; font-weight: 800; color: #0d9488; margin-bottom: 8px;">Loading Smart Healthcare Ecosystem...</h2>
+      <p style="font-size: 14px; color: #64748b;">Redirecting to live application...</p>
     </div>
   </body>
 </html>
