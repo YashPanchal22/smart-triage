@@ -15,7 +15,9 @@
           var decoded = l.search.slice(1).split('&').map(function(s) {
             return s.replace(/~and~/g, '&');
           }).join('?');
-          window.location.hash = '#' + decoded;
+          var targetRoute = decoded.startsWith('/') ? decoded : '/' + decoded;
+          var cleanPath = l.pathname.endsWith('/') ? l.pathname : l.pathname + '/';
+          window.history.replaceState(null, '', cleanPath + '#' + targetRoute);
         }
       }(window.location));
     </script>

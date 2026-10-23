@@ -32,6 +32,7 @@ import PatientDash from './pages/dash/PatientDash';
 import { DoctorDash, NurseDash } from './pages/dash/ClinicalDash';
 import { EmergencyDash, BloodDash, PharmacyDash, LabDash } from './pages/dash/OpsDash';
 import SuperDash from './pages/dash/SuperDash';
+import NotFound from './pages/NotFound';
 
 function Guard({ children, roles }: { children: JSX.Element; roles?: string[] }) {
   const { user } = useAuth();
@@ -104,7 +105,8 @@ export default function App() {
       <Route path="/settings" element={<Guard roles={['admin', 'superadmin']}><Settings /></Guard>} />
       <Route path="/users" element={<Guard roles={['admin', 'superadmin']}><Users /></Guard>} />
       <Route path="/system" element={<Guard roles={['admin', 'superadmin']}><System /></Guard>} />
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="/dashboard" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }

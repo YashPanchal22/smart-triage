@@ -1,16 +1,24 @@
 import axios from 'axios';
 import { routeMock } from './mockApi';
 
-export const isStaticDemo = typeof window !== 'undefined' && 
-  (window.location.hostname.includes('github.io') || window.location.protocol === 'file:');
+export const isStaticDemo = typeof window !== 'undefined' && (
+  window.location.hostname.includes('github.io') ||
+  window.location.hostname.includes('vercel.app') ||
+  window.location.hostname.includes('netlify.app') ||
+  window.location.hostname.includes('pages.dev') ||
+  window.location.hostname.includes('onrender.com') ||
+  window.location.protocol === 'file:' ||
+  import.meta.env.VITE_STATIC_DEMO === 'true' ||
+  (!import.meta.env.VITE_API_URL && window.location.port !== '5173' && window.location.hostname === 'localhost')
+);
 
-export const api = axios.create({ baseURL: '' });
+export const api = axios.create({ baseURL: import.meta.env.VITE_API_URL || '' });
 
 api.interceptors.request.use(async (cfg) => {
   const t = localStorage.getItem('triage_token');
   if (t) cfg.headers.Authorization = `Bearer ${t}`;
 
-  // If running on static host (GitHub Pages), resolve immediately with full realistic demo data
+  // If running on static host (GitHub Pages/Vercel/Netlify), resolve immediately with full realistic demo data
   if (isStaticDemo) {
     cfg.adapter = async (config) => {
       let parsedData: any = config.data;
@@ -32,11 +40,27 @@ api.interceptors.request.use(async (cfg) => {
 });
 
 api.interceptors.response.use(
-  (r) => r,
+  (r) => {
+    // If an SPA rewrite caught an /api request and returned index.html, fallback to mock!
+    if (typeof r.data === 'string' && (r.data.trim().startsWith('<!doctype') || r.data.trim().startsWith('<html'))) {
+      const cfg = r.config;
+      let parsedData: any = cfg.data;
+      if (typeof parsedData === 'string') {
+        try { parsedData = JSON.parse(parsedData); } catch {}
+      }
+      const mockResult = routeMock(cfg.method || 'get', cfg.url || '', parsedData, cfg.params);
+      return {
+        ...r,
+        data: mockResult,
+        statusText: 'OK (Mock Fallback)',
+      };
+    }
+    return r;
+  },
   async (err) => {
-    // If backend gave 404 or network connection error, fallback to mock data seamlessly!
+    // If backend gave 404, 502, 503 or network connection error, fallback to mock data seamlessly!
     const cfg = err?.config;
-    if (cfg && (err.response?.status === 404 || !err.response || err.code === 'ERR_NETWORK')) {
+    if (cfg && (err.response?.status === 404 || err.response?.status === 502 || err.response?.status === 503 || !err.response || err.code === 'ERR_NETWORK')) {
       let parsedData: any = cfg.data;
       if (typeof parsedData === 'string') {
         try { parsedData = JSON.parse(parsedData); } catch {}

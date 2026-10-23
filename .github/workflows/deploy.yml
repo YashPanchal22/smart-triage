@@ -8,6 +8,12 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 'pages'
+  cancel-in-progress: false
 
 jobs:
   build-and-deploy:
@@ -31,8 +37,23 @@ jobs:
         working-directory: frontend
         run: npm run build
 
-      - name: Deploy to GitHub Pages branch
+      - name: Deploy to GitHub Pages branch (gh-pages)
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: frontend/dist
           branch: gh-pages
+
+      - name: Setup Pages (for GitHub Actions deployment mode)
+        uses: actions/configure-pages@v5
+        continue-on-error: true
+
+      - name: Upload Pages artifact (for GitHub Actions deployment mode)
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: frontend/dist
+        continue-on-error: true
+
+      - name: Deploy to GitHub Pages (for GitHub Actions deployment mode)
+        id: deployment
+        uses: actions/deploy-pages@v4
+        continue-on-error: true

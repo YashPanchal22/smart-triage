@@ -39,9 +39,16 @@ app = FastAPI(
     openapi_url="/api/openapi.json",
 )
 
+import os
+cors_origins_env = os.getenv("CORS_ORIGINS", "")
+origins = [o.strip() for o in cors_origins_env.split(",") if o.strip()]
+if not origins:
+    origins = ["http://localhost:5173", "http://localhost:3000", "https://yashpanchal22.github.io"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
+    allow_origin_regex=r"https://.*\.github\.io|https://.*\.vercel\.app|https://.*\.netlify\.app|http://localhost:\d+",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

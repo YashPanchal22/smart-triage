@@ -30,8 +30,14 @@ export function LiveProvider({ children }: { children: React.ReactNode }) {
       }
     };
 
-    const isStaticDeploy = typeof window !== 'undefined' && 
-      (window.location.hostname.includes('github.io') || window.location.hostname === 'localhost' && window.location.port !== '5173');
+    const isStaticDeploy = typeof window !== 'undefined' && (
+      window.location.hostname.includes('github.io') ||
+      window.location.hostname.includes('vercel.app') ||
+      window.location.hostname.includes('netlify.app') ||
+      window.location.hostname.includes('pages.dev') ||
+      (window.location.hostname === 'localhost' && window.location.port !== '5173') ||
+      import.meta.env.VITE_STATIC_DEMO === 'true'
+    );
 
     const connect = () => {
       if (isStaticDeploy) {
