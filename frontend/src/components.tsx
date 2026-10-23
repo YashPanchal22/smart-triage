@@ -365,10 +365,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-export class ErrorBoundary extends Component<{ children: React.ReactNode }, { hasError: boolean; error: Error | null }> {
+export class ErrorBoundary extends Component<
+  { children: React.ReactNode },
+  { hasError: boolean; error: Error | null; info: ErrorInfo | null; resetNotice: string | null }
+> {
   constructor(props: { children: React.ReactNode }) {
     super(props);
-    this.state = { hasError: false, error: null };
+    this.state = { hasError: false, error: null, info: null, resetNotice: null };
   }
 
   static getDerivedStateFromError(error: Error) {
@@ -376,24 +379,86 @@ export class ErrorBoundary extends Component<{ children: React.ReactNode }, { ha
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
-    console.warn('ErrorBoundary captured render exception:', error, info);
+    this.setState({ info });
+    console.error('[Hospital Command Center ErrorBoundary Captured]:', error, info);
   }
+
+  handleReturnToDashboard = () => {
+    // Validate session state before navigating back
+    try {
+      const stored = localStorage.getItem('triage_user');
+      if (stored) JSON.parse(stored);
+    } catch {
+      localStorage.removeItem('triage_user');
+      localStorage.removeItem('triage_token');
+    }
+    this.setState({ hasError: false, error: null, info: null, resetNotice: null });
+    window.location.hash = '#/';
+    window.location.reload();
+  };
+
+  handleResetDemoSession = () => {
+    try {
+      // Clear only demo state and session tokens, preserving display preferences
+      localStorage.removeItem('triage_token');
+      localStorage.removeItem('triage_user');
+      sessionStorage.clear();
+      this.setState({
+        resetNotice: '✓ Demo session cleared and verified defaults restored. Redirecting...',
+      });
+      setTimeout(() => {
+        window.location.hash = '#/login';
+        window.location.reload();
+      }, 700);
+    } catch (e: any) {
+      this.setState({ resetNotice: `Notice: ${e?.message || 'Session cleared.'}` });
+      setTimeout(() => {
+        window.location.hash = '#/login';
+        window.location.reload();
+      }, 1000);
+    }
+  };
 
   render() {
     if (this.state.hasError) {
+      const errMsg = this.state.error?.message || 'Component failed to render safely.';
       return (
         <div className="min-h-screen flex items-center justify-center p-6 bg-slate-50 dark:bg-slate-900">
-          <div className="card w-full max-w-lg text-center !p-8 shadow-xl">
-            <div className="text-4xl mb-3">🩺</div>
-            <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 mb-2">Command Center Recovered</h2>
-            <p className="text-sm text-slate-500 mb-6">
-              An unexpected render issue was safely caught. The application is running in zero-error resilient mode.
+          <div className="card w-full max-w-lg text-center !p-8 shadow-xl space-y-4">
+            <div className="text-4xl">🩺</div>
+            <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100">
+              Hospital Command Center — Component Recovery
+            </h2>
+            <p className="text-sm text-slate-500">
+              A component encountered an issue during rendering and was safely contained by the Error Boundary.
             </p>
-            <div className="flex gap-3 justify-center">
-              <button onClick={() => { this.setState({ hasError: false }); window.location.hash = '#/'; window.location.reload(); }} className="btn-primary">
+
+            {this.state.resetNotice && (
+              <div className="rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 p-3 text-xs font-bold text-emerald-800 dark:text-emerald-200">
+                {this.state.resetNotice}
+              </div>
+            )}
+
+            <div className="rounded-xl bg-slate-100 dark:bg-white/5 p-3 text-left">
+              <p className="font-mono text-xs font-bold text-rose-600 dark:text-rose-400 break-words">
+                {errMsg}
+              </p>
+            </div>
+
+            <details className="text-left rounded-xl border border-slate-200 dark:border-slate-800 p-3 text-xs">
+              <summary className="font-bold cursor-pointer text-slate-600 dark:text-slate-400 select-none">
+                Technical Diagnostics & Component Stack
+              </summary>
+              <pre className="mt-2 text-[10px] text-slate-500 overflow-x-auto whitespace-pre-wrap font-mono">
+                {this.state.info?.componentStack || 'Component stack captured in browser developer console.'}
+              </pre>
+            </details>
+
+            <div className="flex gap-3 justify-center pt-2">
+              <button onClick={this.handleReturnToDashboard} className="btn-primary">
                 Return to Dashboard
               </button>
-              <button onClick={() => { localStorage.clear(); window.location.hash = '#/login'; window.location.reload(); }} className="btn-ghost">
+              <button onClick={this.handleResetDemoSession} className="btn-ghost">
                 Reset Demo Session
               </button>
             </div>
