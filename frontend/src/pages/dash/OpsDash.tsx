@@ -100,8 +100,8 @@ export function PharmacyDash() {
         <Kpi title="Alerts" value={d.low_stock + d.expiring_soon} icon="🔴" />
       </div>
       <div className="grid gap-4 md:grid-cols-2">
-        <div className="card"><h3 className="h-section">⚠️ Low stock</h3><div className="mt-2 space-y-1">{d.low_list.map((x: any) => <div key={x.id} className="flex justify-between rounded-lg bg-amber-50 dark:bg-amber-900/20 p-2 text-sm"><span>{x.name}</span><b>{x.qty} left</b></div>)}{d.low_list.length === 0 && <p className="text-sm text-slate-500">All good ✓</p>}</div></div>
-        <div className="card"><h3 className="h-section">⏰ Expiring soon</h3><div className="mt-2 space-y-1">{d.expiring_list.map((x: any) => <div key={x.id} className="flex justify-between rounded-lg bg-red-50 dark:bg-red-900/20 p-2 text-sm"><span>{x.name} · {x.batch}</span><b>{x.expiry}</b></div>)}{d.expiring_list.length === 0 && <p className="text-sm text-slate-500">Nothing expiring ✓</p>}</div></div>
+        <div className="card"><h3 className="h-section">⚠️ Low stock</h3><div className="mt-2 space-y-1">{(d.low_list || []).map((x: any) => <div key={x.id} className="flex justify-between rounded-lg bg-amber-50 dark:bg-amber-900/20 p-2 text-sm"><span>{x.name}</span><b>{x.qty} left</b></div>)}{(d.low_list || []).length === 0 && <p className="text-sm text-slate-500">All good ✓</p>}</div></div>
+        <div className="card"><h3 className="h-section">⏰ Expiring soon</h3><div className="mt-2 space-y-1">{(d.expiring_list || []).map((x: any) => <div key={x.id} className="flex justify-between rounded-lg bg-red-50 dark:bg-red-900/20 p-2 text-sm"><span>{x.name} · {x.batch}</span><b>{x.expiry}</b></div>)}{(d.expiring_list || []).length === 0 && <p className="text-sm text-slate-500">Nothing expiring ✓</p>}</div></div>
       </div>
     </div>
   );
@@ -122,14 +122,14 @@ export function LabDash() {
         <Link to="/lab" className="btn-primary">Open lab bench</Link>
       </div>
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
-        <Kpi title="Pending total" value={d.pending_total} icon="📋" />
-        <Kpi title="Awaiting sample" value={d.by_status.requested} icon="🧪" />
-        <Kpi title="Processing" value={d.by_status.processing + d.by_status.sample_collected} icon="🔬" />
-        <Kpi title="Done today" value={d.done_today} icon="✅" />
-        <Kpi title="Reviewed" value={d.by_status.reviewed} icon="📄" />
+        <Kpi title="Pending total" value={d.pending_total || 0} icon="📋" />
+        <Kpi title="Awaiting sample" value={d.by_status?.requested || 0} icon="🧪" />
+        <Kpi title="Processing" value={(d.by_status?.processing || 0) + (d.by_status?.sample_collected || 0)} icon="🔬" />
+        <Kpi title="Done today" value={d.done_today || 0} icon="✅" />
+        <Kpi title="Reviewed" value={d.by_status?.reviewed || 0} icon="📄" />
       </div>
       <div className="card"><h3 className="h-section">Workload by test</h3>
-        <div className="h-56"><ResponsiveContainer><BarChart data={d.by_test} layout="vertical"><XAxis type="number" /><YAxis type="category" dataKey="name" width={170} tick={{ fontSize: 11 }} /><Tooltip /><Bar dataKey="value" fill="#8b5cf6" radius={4} /></BarChart></ResponsiveContainer></div></div>
+        <div className="h-56"><ResponsiveContainer><BarChart data={d.by_test || []} layout="vertical"><XAxis type="number" /><YAxis type="category" dataKey="name" width={170} tick={{ fontSize: 11 }} /><Tooltip /><Bar dataKey="value" fill="#8b5cf6" radius={4} /></BarChart></ResponsiveContainer></div></div>
     </div>
   );
 }

@@ -5,15 +5,18 @@ import App from './App';
 import './index.css';
 import { AuthProvider } from './auth';
 import { LiveProvider } from './live';
+import { ErrorBoundary } from './components';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <HashRouter>
-      <AuthProvider>
-        <LiveProvider>
-          <App />
-        </LiveProvider>
-      </AuthProvider>
-    </HashRouter>
+    <ErrorBoundary>
+      <HashRouter>
+        <AuthProvider>
+          <LiveProvider>
+            <App />
+          </LiveProvider>
+        </AuthProvider>
+      </HashRouter>
+    </ErrorBoundary>
   </React.StrictMode>
 );

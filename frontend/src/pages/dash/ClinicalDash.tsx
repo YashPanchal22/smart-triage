@@ -35,7 +35,7 @@ export function DoctorDash() {
         <div className="flex items-center justify-between p-4 pb-2"><h3 className="h-section">My priority queue</h3><Link to="/queue" className="text-sm font-bold text-brand-600">Open full queue →</Link></div>
         <div className="overflow-x-auto"><table className="grid-table">
           <thead><tr><th>Priority</th><th>Patient</th><th>Waiting</th><th>Department</th><th>Status</th></tr></thead>
-          <tbody>{d.queue.map((q: any) => <tr key={q.id} className={`pri-${q.priority}`}><td><PriorityBadge value={q.priority} /></td><td className="font-semibold">{q.patient}<div className="text-xs font-normal text-slate-500">{q.code}</div></td><td className="font-bold">{q.wait} min</td><td>{q.dept}</td><td><StatusBadge value={q.status} /></td></tr>)}</tbody>
+          <tbody>{(d.queue || []).map((q: any) => <tr key={q.id} className={`pri-${q.priority}`}><td><PriorityBadge value={q.priority} /></td><td className="font-semibold">{q.patient}<div className="text-xs font-normal text-slate-500">{q.code}</div></td><td className="font-bold">{q.wait} min</td><td>{q.dept}</td><td><StatusBadge value={q.status} /></td></tr>)}</tbody>
         </table></div>
       </div>
     </div>

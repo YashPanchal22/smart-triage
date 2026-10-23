@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from './auth';
 import { useLive } from './live';
 import { PRIORITY_META } from './api';
-import { useEffect, useRef, useState } from 'react';
+import React, { Component, ErrorInfo, useEffect, useRef, useState } from 'react';
 import { api } from './api';
 
 export const DISCLAIMER = 'Decision-support & education only — not a diagnosis. DEMONSTRATION SYSTEM — SYNTHETIC DATA.';
@@ -325,3 +325,44 @@ export function Layout({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
+
+export class ErrorBoundary extends Component<{ children: React.ReactNode }, { hasError: boolean; error: Error | null }> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    console.warn('ErrorBoundary captured render exception:', error, info);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen flex items-center justify-center p-6 bg-slate-50 dark:bg-slate-900">
+          <div className="card w-full max-w-lg text-center !p-8 shadow-xl">
+            <div className="text-4xl mb-3">🩺</div>
+            <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 mb-2">Command Center Recovered</h2>
+            <p className="text-sm text-slate-500 mb-6">
+              An unexpected render issue was safely caught. The application is running in zero-error resilient mode.
+            </p>
+            <div className="flex gap-3 justify-center">
+              <button onClick={() => { this.setState({ hasError: false }); window.location.hash = '#/'; window.location.reload(); }} className="btn-primary">
+                Return to Dashboard
+              </button>
+              <button onClick={() => { localStorage.clear(); window.location.hash = '#/login'; window.location.reload(); }} className="btn-ghost">
+                Reset Demo Session
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+

@@ -286,12 +286,30 @@ export function routeMock(method: string, url: string, data?: any, params?: any)
         semi_urgent: mockQueue.filter(q => q.priority === 'semi_urgent').length,
         routine: mockQueue.filter(q => q.priority === 'routine').length
       },
+      under_assessment: mockQueue.filter(q => q.status === 'under_assessment').length || 2,
+      completed_today: 48,
+      doctors_available: 6,
       admitted_today: 18,
-      discharged_today: 15
+      discharged_today: 15,
+      waiting_stats_30d: { mean: 14, median: 12, min: 2, max: 48, count: 142 }
     };
   }
   if (norm === '/analytics/distributions') {
+    const daily = [];
+    for (let i = 13; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      daily.push({ date: d.toISOString().slice(5, 10), count: Math.floor(Math.sin(i) * 8) + 24 });
+    }
+    const by_priority = [
+      { name: 'Emergency', key: 'emergency', value: 14 },
+      { name: 'Urgent', key: 'urgent', value: 38 },
+      { name: 'Semi-Urgent', key: 'semi_urgent', value: 72 },
+      { name: 'Routine', key: 'routine', value: 94 }
+    ];
     return {
+      by_priority,
+      daily,
       hourly: [
         { hour: '08:00', count: 12 }, { hour: '10:00', count: 32 }, { hour: '12:00', count: 38 },
         { hour: '14:00', count: 24 }, { hour: '16:00', count: 18 }, { hour: '18:00', count: 12 },
@@ -302,21 +320,182 @@ export function routeMock(method: string, url: string, data?: any, params?: any)
         { department: 'Pediatrics', count: 21 }, { department: 'Orthopedics', count: 19 },
         { department: 'General Medicine', count: 38 }
       ],
-      priorities: [
-        { priority: 'Emergency', count: 14 }, { priority: 'Urgent', count: 38 },
-        { priority: 'Semi-Urgent', count: 72 }, { priority: 'Routine', count: 94 }
-      ]
+      by_department: [
+        { name: 'Emergency', value: 38 }, { name: 'Cardiology', value: 26 },
+        { name: 'Pediatrics', value: 21 }, { name: 'Orthopedics', value: 19 },
+        { name: 'General Medicine', value: 38 }
+      ],
+      workload: [
+        { name: 'Emergency', value: 12 }, { name: 'Cardiology', value: 8 },
+        { name: 'Pediatrics', value: 5 }, { name: 'General Medicine', value: 15 }
+      ],
+      completed_vs_waiting: [{ name: 'Completed', value: 48 }, { name: 'Active', value: 18 }],
+      waits_sample: [10, 15, 20, 25, 30, 12, 18, 22, 14, 16]
     };
   }
   if (norm === '/analytics/ecosystem' || norm === '/analytics/kpis') {
     return {
+      appointments_today: 18,
+      appointments_upcoming: 42,
+      blood_units: 418,
+      blood_open_requests: 3,
+      emergencies_active: 4,
+      ambulances_available: 5,
+      beds_total: 220,
+      beds_occupied: 164,
+      bed_utilization: 74.5,
+      unpaid_billing: 18450,
+      donors: 500,
       total_patients: 1042,
       total_doctors: 100,
-      total_beds: 220,
-      occupied_beds: 164,
-      blood_units: 418,
-      emergency_active: 4,
       system_uptime: '99.98%'
+    };
+  }
+
+  // Role Dashboards Overview
+  if (norm === '/doctor/overview') {
+    return {
+      today_total: 24,
+      waiting: 6,
+      emergency: 1,
+      completed_today: 18,
+      appointments_today: 8,
+      lab_ready: 3,
+      lab_pending: 2,
+      queue: mockQueue.map(q => ({
+        id: q.id,
+        patient: q.patient_name,
+        code: q.patient_code,
+        wait: q.waiting_live_min,
+        dept: q.department,
+        status: q.status,
+        priority: q.priority
+      }))
+    };
+  }
+  if (norm === '/nurse/overview') {
+    return {
+      assigned: 14,
+      waiting_triage: 4,
+      vitals_pending: 2,
+      tasks_open: 5,
+      high_priority: 2,
+      beds_available: 56,
+      triage_waitlist: [
+        { id: 101, complaint: 'Chest discomfort & shortness of breath' },
+        { id: 102, complaint: 'Acute lower right abdominal pain' }
+      ]
+    };
+  }
+  if (norm === '/patient/overview') {
+    return {
+      linked: true,
+      hint: 'Your profile PAT-2026-001 is active in the hospital registry.',
+      upcoming: {
+        doctor: 'Dr. Ananya Roy',
+        dept: 'Cardiology',
+        date: '2026-10-24',
+        slot: '10:00 AM',
+        status: 'confirmed'
+      },
+      queue_position: 2,
+      queue_total: 5,
+      last_visit: {
+        date: '2026-10-22',
+        dept: 'Emergency',
+        status: 'completed'
+      },
+      unread: 2,
+      active_visits: [
+        {
+          id: 101,
+          dept: 'Cardiology',
+          complaint: 'Follow-up ECG checkup',
+          priority: 'urgent',
+          status: 'under_assessment'
+        }
+      ]
+    };
+  }
+  if (norm === '/superadmin/overview') {
+    return {
+      users_total: Object.keys(DEMO_USERS).length,
+      users_active: Object.keys(DEMO_USERS).length,
+      by_role: [
+        { role: 'admin', count: 1 },
+        { role: 'superadmin', count: 1 },
+        { role: 'doctor', count: 1 },
+        { role: 'nurse', count: 1 },
+        { role: 'triage', count: 1 },
+        { role: 'patient', count: 1 },
+        { role: 'blood', count: 1 },
+        { role: 'emergency', count: 1 },
+        { role: 'pharmacy', count: 1 },
+        { role: 'lab', count: 1 }
+      ],
+      tables: {
+        patients: 1042,
+        visits: 5000,
+        appointments: 5000,
+        doctors: 100,
+        departments: 8,
+        blood_donors: 500,
+        blood_inventory: 8,
+        emergency_requests: 60,
+        ambulances: 12,
+        medicines: 30,
+        audit_logs: 12450
+      },
+      recent_audit: [
+        { action: 'LOGIN_SUCCESS', entity: 'User #1 (admin)', at: new Date().toISOString() },
+        { action: 'QUEUE_STATUS_CHANGE', entity: 'Visit #101', at: new Date().toISOString() },
+        { action: 'TRIAGE_CLASSIFIED', entity: 'Patient #2', at: new Date().toISOString() }
+      ]
+    };
+  }
+  if (norm === '/pharmacy/overview') {
+    return {
+      total_items: 142,
+      total_units: 4850,
+      low_stock: 4,
+      expiring_soon: 2,
+      pending_orders: 3,
+      low_list: [
+        { id: 1, name: 'Amoxicillin 500mg', qty: 12 },
+        { id: 2, name: 'Paracetamol IV 100ml', qty: 8 },
+        { id: 3, name: 'Insulin Glargine 100IU', qty: 4 }
+      ],
+      expiring_list: [
+        { id: 4, name: 'Ceftriaxone 1g Inj', batch: 'BAT-2024-88', expiry: '2026-11-15' },
+        { id: 5, name: 'Pantoprazole 40mg Inj', batch: 'BAT-2024-91', expiry: '2026-11-30' }
+      ]
+    };
+  }
+  if (norm === '/lab/overview') {
+    return {
+      pending_total: 12,
+      by_status: {
+        requested: 3,
+        processing: 4,
+        sample_collected: 2,
+        reviewed: 8
+      },
+      done_today: 18,
+      by_test: [
+        { name: 'Complete Blood Count (CBC)', value: 18 },
+        { name: 'Lipid Profile', value: 12 },
+        { name: 'Liver Function Test (LFT)', value: 9 },
+        { name: 'Renal Function Test (RFT)', value: 8 },
+        { name: 'HbA1c Blood Glucose', value: 15 }
+      ]
+    };
+  }
+  if (norm === '/settings') {
+    return {
+      theme: localStorage.getItem('triage_theme') || 'light',
+      hospital_name: 'Smart Healthcare Ecosystem',
+      auto_triage: true,
+      notifications_enabled: true
     };
   }
 
